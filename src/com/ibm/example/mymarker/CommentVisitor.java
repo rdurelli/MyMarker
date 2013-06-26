@@ -42,7 +42,16 @@ public class CommentVisitor extends ASTVisitor {
         
 		try {
 			IMarker marker = this.fileToSeekComments.createMarker("com.ibm.mymarkers.mymarker");
-			marker.setAttribute(IMarker.MESSAGE, "Uma boa mensagem deve vir aqui....");
+			marker.setAttribute(IMarker.MESSAGE, "Please look at the above SQL UPDATE statement and then see where it is been used. Furthermore, remove it and use the generated code. For instance:\n" + 
+					"				(i) Firstly create an instance of the Cliente object\n" + 
+					"				(ii) Secondly, set all attributes of this object that you would like to update\n" + 
+					"				(iii) Thirdly, create an instance of the JDBCClienteDAO object\n" + 
+					"				(iv) Fourthly, call the method update\n" + 
+					"				 Source-code example:\n" + 
+					"				 Cliente arg = new Cliente();\n" + 
+					"				 arg.setSomething();\n" + 
+					"				 JDBCClienteDAO argDAO = new JDBCClienteDAO();\n" + 
+					"				 argDAO.update(arg);");
 	        marker.setAttribute(IMarker.PRIORITY, 0);
 	        marker.setAttribute(IMarker.LINE_NUMBER, startLineNumber2);
 	        marker.setAttribute(IMarker.SEVERITY, 0);

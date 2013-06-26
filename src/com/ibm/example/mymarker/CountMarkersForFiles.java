@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -38,17 +39,24 @@ public class CountMarkersForFiles implements IEditorActionDelegate {
 	@Override
 	public void setActiveEditor(IAction action, IEditorPart editor) {		
 	}
-
 	
-	private void teste (String filePath) throws IOException {
+	
+	private void createHighlightForIFile(IFile fileToCreateTheHighlight) throws JavaModelException {
 		
-		File javaFile = new File(filePath);
-		BufferedReader in = new BufferedReader(new FileReader(javaFile));
-		final StringBuffer buffer = new StringBuffer();
-		String line = null;
-		while (null != (line = in.readLine())) {
-		     buffer.append(line).append("\n");
-		}
+		ICompilationUnit unit =  JavaCore.createCompilationUnitFrom(fileToCreateTheHighlight);
+		
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+	    parser.setKind(ASTParser.K_COMPILATION_UNIT);
+	    parser.setSource(unit);
+	    parser.setResolveBindings(true);
+		CompilationUnit parse =  (CompilationUnit) parser.createAST(null);
+		
+		String[] source = unit.getSource().split("\n");
+		
+		for (Comment comment : (List<Comment>) parse.getCommentList()) {
+
+	        comment.accept(new CommentVisitor(parse, source, fileToCreateTheHighlight));
+	    }
 		
 	}
 	
@@ -65,11 +73,28 @@ public class CountMarkersForFiles implements IEditorActionDelegate {
 			if (selection.getFirstElement() instanceof IOpenable) {
 				IResource resource = (IResource) ((IAdaptable) selection.getFirstElement()).getAdapter(IResource.class);
 				
+				
+				
+				if (resource instanceof IFile) {
+					
+					IFile fileToCreateTheHighlight = (IFile) resource;
+					
+					try {
+						this.createHighlightForIFile(fileToCreateTheHighlight);
+					} catch (JavaModelException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					//chamar uma classe para cuidar de IFILE
+					
+					
+				} else if (resource instanceof IProject) {
+					
+					//chamar uma classe para cuidar de IProject..
+					
+				}
+				
 				IFile fileTeste = (IFile) resource;
-				
-				
-				
-				
 				
 				ICompilationUnit unit =  JavaCore.createCompilationUnitFrom(fileTeste);
 				
